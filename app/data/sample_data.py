@@ -1,5 +1,4 @@
-from datetime import datetime, timezone
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 
 from app.domain.catalog.entities import Game, GameDetail, Platform
 from app.domain.content.entities import Entity, EventItem, Guide, NewsItem
