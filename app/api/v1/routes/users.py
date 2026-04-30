@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.dependencies import get_catalog_service, get_user_service
-from app.api.v1.schemas.catalog import GameSummaryResponse
+from app.api.v1.mappers import game_summary_from_detail
 from app.api.v1.schemas.common import PageMeta
 from app.api.v1.schemas.users import UserLibraryItemResponse, UserLibraryResponse, UserProfileResponse
 from app.application.services.catalog_service import CatalogService
@@ -27,17 +27,7 @@ def _library_item_response(
     catalog_service: CatalogService,
 ) -> UserLibraryItemResponse:
     detail = catalog_service.get_game_detail(item.game_id)
-    game_summary = GameSummaryResponse(
-        id=detail.id if detail else item.game_id,
-        title=detail.title if detail else "Unknown",
-        platforms=[] if not detail else [
-            {"id": platform.id, "name": platform.name, "family": platform.family}
-            for platform in detail.platforms
-        ],
-        genres=[] if not detail else detail.genres,
-        release_year=None if not detail else detail.release_year,
-        publisher=None if not detail else detail.publisher,
-    )
+    game_summary = game_summary_from_detail(detail, item.game_id)
     return UserLibraryItemResponse(
         game=game_summary,
         status=item.status,

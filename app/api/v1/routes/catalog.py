@@ -1,44 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api.dependencies import get_catalog_service
-from app.api.v1.schemas.catalog import (
-    GameDetailResponse,
-    GameSearchResponse,
-    GameSummaryResponse,
-    PlatformResponse,
-)
+from app.api.v1.mappers import to_game_detail_response, to_game_summary_response
+from app.api.v1.schemas.catalog import GameDetailResponse, GameSearchResponse, GameSummaryResponse
 from app.api.v1.schemas.common import PageMeta
 from app.application.services.catalog_service import CatalogService
 from app.core.config import settings
-from app.domain.catalog.entities import Game, GameDetail, Platform
 from app.domain.catalog.filters import GameSearchFilters
 
 router = APIRouter()
-
-
-def _platform_response(platform: Platform) -> PlatformResponse:
-    return PlatformResponse(id=platform.id, name=platform.name, family=platform.family)
-
-
-def _game_summary_response(game: Game) -> GameSummaryResponse:
-    return GameSummaryResponse(
-        id=game.id,
-        title=game.title,
-        platforms=[_platform_response(platform) for platform in game.platforms],
-        genres=game.genres,
-        release_year=game.release_year,
-        publisher=game.publisher,
-    )
-
-
-def _game_detail_response(game: GameDetail) -> GameDetailResponse:
-    return GameDetailResponse(
-        **_game_summary_response(game).model_dump(),
-        description=game.description,
-        multiplayer_modes=game.multiplayer_modes,
-        entities_count=game.entities_count,
-        guides_count=game.guides_count,
-    )
 
 
 @router.get("/search", response_model=GameSearchResponse)
@@ -54,7 +24,7 @@ def search_games(
     filters = GameSearchFilters(query=q, platform=platform, genre=genre, region=region)
     result = service.search_games(filters, page=page, page_size=page_size)
     return GameSearchResponse(
-        items=[_game_summary_response(game) for game in result.items],
+        items=[to_game_summary_response(game) for game in result.items],
         meta=PageMeta(
             page=result.page,
             page_size=result.page_size,
@@ -72,4 +42,4 @@ def get_game(
     detail = service.get_game_detail(game_id)
     if not detail:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Game not found.")
-    return _game_detail_response(detail)
+    return to_game_detail_response(detail)

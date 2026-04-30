@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.api.dependencies import get_catalog_service, get_recommendation_service
-from app.api.v1.schemas.catalog import GameSummaryResponse
+from app.api.v1.mappers import game_summary_from_detail
 from app.api.v1.schemas.recommendations import RecommendationResponse
 from app.application.services.catalog_service import CatalogService
 from app.application.services.recommendation_service import RecommendationService
@@ -15,17 +15,7 @@ def _recommendation_response(
     catalog_service: CatalogService,
 ) -> RecommendationResponse:
     detail = catalog_service.get_game_detail(recommendation.game_id)
-    game_summary = GameSummaryResponse(
-        id=detail.id if detail else recommendation.game_id,
-        title=detail.title if detail else "Unknown",
-        platforms=[] if not detail else [
-            {"id": platform.id, "name": platform.name, "family": platform.family}
-            for platform in detail.platforms
-        ],
-        genres=[] if not detail else detail.genres,
-        release_year=None if not detail else detail.release_year,
-        publisher=None if not detail else detail.publisher,
-    )
+    game_summary = game_summary_from_detail(detail, recommendation.game_id)
     return RecommendationResponse(
         game=game_summary,
         reason=recommendation.reason,
