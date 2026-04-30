@@ -5,7 +5,7 @@ from app.domain.users.entities import UserLibraryItem, UserProfile
 
 class UserRepository(Protocol):
     def get_profile(self, user_id: str) -> UserProfile | None:
-        raise NotImplementedError
+        ...
 
     def get_library(self, user_id: str) -> list[UserLibraryItem]:
-        raise NotImplementedError
+        ...

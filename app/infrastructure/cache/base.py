@@ -5,7 +5,7 @@ T = TypeVar("T")
 
 class Cache(Protocol):
     def get(self, key: str) -> T | None:
-        raise NotImplementedError
+        ...
 
     def set(self, key: str, value: T, ttl_seconds: int) -> None:
-        raise NotImplementedError
+        ...
