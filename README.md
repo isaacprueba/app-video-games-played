@@ -52,11 +52,24 @@ Plataforma inteligente para descubrir, trackear y potenciar la experiencia de cu
 ```
 app/
   api/
-    routes/
+    v1/
+      routes/
+      schemas/
+  application/
+    ports/
+    services/
   core/
+  data/
+  domain/
+  infrastructure/
   main.py
-  schemas.py
+tests/
+  unit/
+  integration/
+  contract/
 requirements.txt
+requirements-dev.txt
+TECHNICAL_DOCUMENTATION.md
 ```
 
 ## Desarrollo local
@@ -64,8 +77,16 @@ requirements.txt
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+pip install -r requirements-dev.txt
 uvicorn app.main:app --reload
 ```
+
+## Endpoints base (v1)
+- Prefijo: `/api/v1`
+- Salud: `GET /health`
+
+## Documentación técnica integral
+Consulta `TECHNICAL_DOCUMENTATION.md`.
 
 ## Roadmap (iteraciones)
 1. **Base API**: scaffolding, modelos, healthcheck, endpoints stub.
